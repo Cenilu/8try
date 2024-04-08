@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Tracking</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize Leaflet map
+        var map = L.map('map', {
+            zoomControl: false // Disable zoom control
+        }).setView([12.8797, 121.7740], 6);
+
+        // Tile Layer
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        osm.addTo(map);
+
+        // Initialize marker and add it to the map
+        var marker = L.marker([0, 0]).addTo(map);
+
+        // Function to handle geolocation error
+        function showError(error) {
+            console.error('Error getting geolocation:', error.message);
+        }
+
+        // Get user's current position and update marker every second
+        function trackUserLocation() {
+            if ("geolocation" in navigator) {
+                
+                setInterval(function() {
+                        navigator.geolocation.watchPosition(function (position) {
+                        var latlng = [position.coords.latitude, position.coords.longitude];
+                        marker.setLatLng(latlng);
+                        map.setView(latlng, 16); // Zoom to user's location with a zoom level of 16
+                        console.log(position.timestamp);
+
+                    }, showError, { enableHighAccuracy: true });
+                }, 1000); // Update every second
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Call the trackUserLocation function to start tracking
+        trackUserLocation();
+    </script>
+</body>
+
+</html>
